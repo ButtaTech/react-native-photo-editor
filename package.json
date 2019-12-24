@@ -1,12 +1,12 @@
 {
-    "name": "react-native-photo-editor",
-    "version": "1.0.4",
-    "description": "React Native: Native Photo Editor",
+    "name": "react-native-bta-photo-editor",
+    "version": "1.0.6-bta",
+    "description": "React Native: BTA Native Photo Editor",
     "main": "RNPhotoEditor.js",
-    "homepage": "https://github.com/prscX/react-native-photo-editor.git",
+    "homepage": "https://github.com/tuenguyenhd/react-native-photo-editor.git",
     "repository": {
         "type": "git",
-        "url": "https://github.com/prscX/react-native-photo-editor.git"
+        "url": "https://github.com/tuenguyenhd/react-native-photo-editor.git"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,9 +14,9 @@
     "keywords": [
         "react-native"
     ],
-    "author": "Pranav Raj Singh Chauhan",
+    "author": "Test",
     "devDependencies": {
         "prettier-pack": "0.0.8"
     },
-    "license": "Apache License 2.0"
+    "license": "UNLICENSED"
 }
