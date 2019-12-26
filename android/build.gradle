@@ -50,4 +50,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.github.yalantis:ucrop:2.2.2-native'
     implementation 'com.android.support:exifinterface:27.1.1'
+    implementation 'ja.burhanrashid52:photoeditor:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
 }

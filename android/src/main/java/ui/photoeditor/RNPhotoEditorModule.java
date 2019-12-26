@@ -2,6 +2,7 @@
 package ui.photoeditor;
 
 import com.ahmedadeltito.photoeditor.PhotoEditorActivity;
+import com.burhanrashid52.photoeditor.EditImageActivity;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Callback;
@@ -14,6 +15,7 @@ import com.facebook.react.bridge.ReadableMap;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -37,6 +39,7 @@ public class RNPhotoEditorModule extends ReactContextBaseJavaModule {
           if (resultCode == Activity.RESULT_CANCELED) {
             mCancelCallback.invoke(resultCode);
           } else {
+            Log.d("BUTTA","Editor call back activity:" +intent.getExtras().getString("imagePath"));
             mDoneCallback.invoke(intent.getExtras().getString("imagePath"));
           }
 
@@ -93,8 +96,12 @@ public class RNPhotoEditorModule extends ReactContextBaseJavaModule {
     }
 
 
-    Intent intent = new Intent(getCurrentActivity(), PhotoEditorActivity.class);
+    Log.d("BUTTA", "OPEN Editor");
+    Intent intent = new Intent(getCurrentActivity(), EditImageActivity.class);
+//    Intent intent = new Intent(getCurrentActivity(), PhotoEditorActivity.class);
+      // set file path of photo
     intent.putExtra("selectedImagePath", path);
+    // optional for PhotoEditorActivity.class
     intent.putExtra("colorPickerColors", colorPickerColors);
     intent.putExtra("hiddenControls", hiddenControlsIntent);
     intent.putExtra("stickers", stickersIntent);

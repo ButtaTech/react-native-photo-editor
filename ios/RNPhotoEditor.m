@@ -1,4 +1,3 @@
-
 #import "RNPhotoEditor.h"
 
 @implementation RNPhotoEditor
@@ -14,7 +13,7 @@ NSString *_editImagePath = nil;
 RCTResponseSenderBlock _onDoneEditing = nil;
 RCTResponseSenderBlock _onCancelEditing = nil;
 
-- (void)doneEditingWithImage:(UIImage *)image {
+- (void)imageEditor:(CLImageEditor*)editor didFinishEdittingWithImage:(UIImage*)image {
     if (_onDoneEditing == nil) return;
     
     NSError* error;
@@ -30,16 +29,17 @@ RCTResponseSenderBlock _onCancelEditing = nil;
     [isPNG ? UIImagePNGRepresentation(image) : UIImageJPEGRepresentation(image, 0.8) writeToFile:path options:NSDataWritingAtomic error:&error];
 
     if (error != nil)
-        NSLog(@"write error %@", error); 
-   
+        NSLog(@"write error %@", error);
+   [editor dismissViewControllerAnimated:YES completion:nil];
     _onDoneEditing(@[]);
 }
 
-- (void)canceledEditing {
+- (void)imageEditorDidCancel:(CLImageEditor*)editor {
     if (_onCancelEditing == nil) return;
-
+    [editor dismissViewControllerAnimated:YES completion:nil];
     _onCancelEditing(@[]);
 }
+
 
 RCT_EXPORT_METHOD(Edit:(nonnull NSDictionary *)props onDone:(RCTResponseSenderBlock)onDone onCancel:(RCTResponseSenderBlock)onCancel) {
 
@@ -49,8 +49,8 @@ RCT_EXPORT_METHOD(Edit:(nonnull NSDictionary *)props onDone:(RCTResponseSenderBl
         _onDoneEditing = onDone;
         _onCancelEditing = onCancel;
 
-        PhotoEditorViewController *photoEditor = [[PhotoEditorViewController alloc] initWithNibName:@"PhotoEditorViewController" bundle: [NSBundle bundleForClass:[PhotoEditorViewController class]]];
-
+//        PhotoEditorViewController *photoEditor = [[PhotoEditorViewController alloc] initWithNibName:@"PhotoEditorViewController" bundle: [NSBundle bundleForClass:[PhotoEditorViewController class]]];
+//
         // Process Image for Editing
         UIImage *image = [UIImage imageWithContentsOfFile:_editImagePath];
         if (image == nil) {
@@ -59,44 +59,47 @@ RCT_EXPORT_METHOD(Edit:(nonnull NSDictionary *)props onDone:(RCTResponseSenderBl
 
             image = [UIImage imageWithData:data];
         }
-
-        photoEditor.image = image;
-
-        // Process Stickers
-        NSArray *stickers = [props objectForKey: @"stickers"];
-        NSMutableArray *imageStickers = [[NSMutableArray alloc] initWithCapacity:stickers.count];
-
-        for (NSString *sticker in stickers) {
-            [imageStickers addObject: [UIImage imageNamed: sticker]];
-        }
-
-        photoEditor.stickers = imageStickers;
-
-        //Process Controls
-        NSArray *hiddenControls = [props objectForKey: @"hiddenControls"];
-        NSMutableArray *passHiddenControls = [[NSMutableArray alloc] initWithCapacity:hiddenControls.count];
-
-        for (NSString *hiddenControl in hiddenControls) {
-            [passHiddenControls addObject: [[NSString alloc] initWithString: hiddenControl]];
-        }
-
-        photoEditor.hiddenControls = passHiddenControls;
-
-        //Process Colors
-        NSArray *colors = [props objectForKey: @"colors"];
-        NSMutableArray *passColors = [[NSMutableArray alloc] initWithCapacity:colors.count];
-
-        for (NSString *color in colors) {
-            [passColors addObject: [self colorWithHexString: color]];
-        }
-
-        photoEditor.colors = passColors;
-
-        // Invoke Editor
-        photoEditor.photoEditorDelegate = self;
-	
-	// The default modal presenting is page sheet in ios 13, not full screen
-	if (@available(iOS 13, *)) {
+//
+//        photoEditor.image = image;
+//
+//        // Process Stickers
+//        NSArray *stickers = [props objectForKey: @"stickers"];
+//        NSMutableArray *imageStickers = [[NSMutableArray alloc] initWithCapacity:stickers.count];
+//
+//        for (NSString *sticker in stickers) {
+//            [imageStickers addObject: [UIImage imageNamed: sticker]];
+//        }
+//
+//        photoEditor.stickers = imageStickers;
+//
+//        //Process Controls
+//        NSArray *hiddenControls = [props objectForKey: @"hiddenControls"];
+//        NSMutableArray *passHiddenControls = [[NSMutableArray alloc] initWithCapacity:hiddenControls.count];
+//
+//        for (NSString *hiddenControl in hiddenControls) {
+//            [passHiddenControls addObject: [[NSString alloc] initWithString: hiddenControl]];
+//        }
+//
+//        photoEditor.hiddenControls = passHiddenControls;
+//
+//        //Process Colors
+//        NSArray *colors = [props objectForKey: @"colors"];
+//        NSMutableArray *passColors = [[NSMutableArray alloc] initWithCapacity:colors.count];
+//
+//        for (NSString *color in colors) {
+//            [passColors addObject: [self colorWithHexString: color]];
+//        }
+//
+//        photoEditor.colors = passColors;
+//
+//        // Invoke Editor
+//        photoEditor.photoEditorDelegate = self;
+        
+        CLImageEditor *photoEditor = [[CLImageEditor alloc] initWithImage:image delegate:NULL];
+        photoEditor.delegate = self;
+    
+        // The default modal presenting is page sheet in ios 13, not full screen
+        if (@available(iOS 13, *)) {
             [photoEditor setModalPresentationStyle: UIModalPresentationFullScreen];
         }
 
@@ -111,6 +114,78 @@ RCT_EXPORT_METHOD(Edit:(nonnull NSDictionary *)props onDone:(RCTResponseSenderBl
         [rootViewController presentViewController:photoEditor animated:YES completion:nil];
     });
 }
+
+
+//RCT_EXPORT_METHOD(Edit:(nonnull NSDictionary *)props onDone:(RCTResponseSenderBlock)onDone onCancel:(RCTResponseSenderBlock)onCancel) {
+//
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        _editImagePath = [props objectForKey: @"path"];
+//
+//        _onDoneEditing = onDone;
+//        _onCancelEditing = onCancel;
+//
+//        PhotoEditorViewController *photoEditor = [[PhotoEditorViewController alloc] initWithNibName:@"PhotoEditorViewController" bundle: [NSBundle bundleForClass:[PhotoEditorViewController class]]];
+//
+//        // Process Image for Editing
+//        UIImage *image = [UIImage imageWithContentsOfFile:_editImagePath];
+//        if (image == nil) {
+//            NSURL *url = [NSURL URLWithString:_editImagePath];
+//            NSData *data = [NSData dataWithContentsOfURL:url];
+//
+//            image = [UIImage imageWithData:data];
+//        }
+//
+//        photoEditor.image = image;
+//
+//        // Process Stickers
+//        NSArray *stickers = [props objectForKey: @"stickers"];
+//        NSMutableArray *imageStickers = [[NSMutableArray alloc] initWithCapacity:stickers.count];
+//
+//        for (NSString *sticker in stickers) {
+//            [imageStickers addObject: [UIImage imageNamed: sticker]];
+//        }
+//
+//        photoEditor.stickers = imageStickers;
+//
+//        //Process Controls
+//        NSArray *hiddenControls = [props objectForKey: @"hiddenControls"];
+//        NSMutableArray *passHiddenControls = [[NSMutableArray alloc] initWithCapacity:hiddenControls.count];
+//
+//        for (NSString *hiddenControl in hiddenControls) {
+//            [passHiddenControls addObject: [[NSString alloc] initWithString: hiddenControl]];
+//        }
+//
+//        photoEditor.hiddenControls = passHiddenControls;
+//
+//        //Process Colors
+//        NSArray *colors = [props objectForKey: @"colors"];
+//        NSMutableArray *passColors = [[NSMutableArray alloc] initWithCapacity:colors.count];
+//
+//        for (NSString *color in colors) {
+//            [passColors addObject: [self colorWithHexString: color]];
+//        }
+//
+//        photoEditor.colors = passColors;
+//
+//        // Invoke Editor
+//        photoEditor.photoEditorDelegate = self;
+//
+//    // The default modal presenting is page sheet in ios 13, not full screen
+//    if (@available(iOS 13, *)) {
+//            [photoEditor setModalPresentationStyle: UIModalPresentationFullScreen];
+//        }
+//
+//        id<UIApplicationDelegate> app = [[UIApplication sharedApplication] delegate];
+//        UINavigationController *rootViewController = ((UINavigationController*) app.window.rootViewController);
+//
+//        if (rootViewController.presentedViewController) {
+//            [rootViewController.presentedViewController presentViewController:photoEditor animated:YES completion:nil];
+//            return;
+//        }
+//
+//        [rootViewController presentViewController:photoEditor animated:YES completion:nil];
+//    });
+//}
 
 
 - (CGFloat) colorComponentFrom: (NSString *) string start: (NSUInteger) start length: (NSUInteger) length {
