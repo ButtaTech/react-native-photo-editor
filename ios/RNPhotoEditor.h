@@ -6,7 +6,7 @@
 #endif
 
 #import <UIKit/UIKit.h>
-@import CLImageEditor;
+#import <CLImageEditor/CLImageEditor.h>
 
 @interface RNPhotoEditor : NSObject <RCTBridgeModule, CLImageEditorDelegate>
 
