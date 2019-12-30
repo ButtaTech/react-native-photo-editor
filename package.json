@@ -1,6 +1,6 @@
 {
     "name": "react-native-bta-photo-editor",
-    "version": "1.0.15-bta",
+    "version": "1.0.16",
     "description": "React Native: BTA Native Photo Editor",
     "main": "RNPhotoEditor.js",
     "homepage": "https://github.com/tuenguyenhd/react-native-photo-editor.git",
