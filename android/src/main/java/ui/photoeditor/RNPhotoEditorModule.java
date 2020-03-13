@@ -1,7 +1,8 @@
 
 package ui.photoeditor;
 
-import com.burhanrashid52.imageeditor.EditImageActivity;
+import com.ahmedadeltito.photoeditor.PhotoEditorActivity;
+import com.burhanrashid52.photoeditor.EditImageActivity;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Callback;
